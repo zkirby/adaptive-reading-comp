@@ -1,5 +1,6 @@
 import Questions from "./components/Questions";
-import { Button } from "../@/components/ui/button"
+import { Button } from "./components/ui/button"
+import { Textarea } from "./components/ui/textarea";
 
 /**
  * @abstract 
@@ -15,12 +16,14 @@ function App() {
       <div>
         <div>History</div>
         Current Prompt (on generation [x])
-        {/* <TextArea /> */}
+        <Textarea />
         <Button variant="default">Update</Button>
         <Button>Copy</Button>
       </div>
 
-      <Questions />
+      <div>
+        <Questions />
+      </div>
     </div>
   );
 }
