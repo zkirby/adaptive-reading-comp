@@ -1,6 +1,6 @@
 /**
  * The most basic filter I could think of. A good baseline for
- * testing other prompts.
+ * testing against other prompts.
  *
  * @attribute Writing improvement.
  */

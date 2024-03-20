@@ -5,7 +5,7 @@ import { askAI } from "./lib/api";
 
 const PROMPTS_DIR = "prompts";
 const DATA_FILE = "data.json";
-const MODEL = "gpt-3.5-turbo";
+const MODEL = "gpt-4";
 
 interface Paragraph {
   source: string;
@@ -46,12 +46,34 @@ const runPrompt = async (
   paragraph: Paragraph
 ) => {
   const response = await askAI(MODEL, `${prompt}\n"${paragraph.source}"`);
-  paragraph.translations.push({ id: file, content: response ?? "" });
+
+  // Replace the existing translation if it exists, otherwise add a new one
+  const existingTranslationIndex = paragraph.translations.findIndex(
+    (translation) => translation.id === file
+  );
+  if (existingTranslationIndex !== -1) {
+    paragraph.translations[existingTranslationIndex].content = response ?? "";
+  } else {
+    paragraph.translations.push({ id: file, content: response ?? "" });
+  }
 };
 
 const main = async () => {
   const prompts = loadPrompts();
   const data = loadData();
+
+  const { paperChoice } = await prompt({
+    type: "select",
+    name: "paperChoice",
+    message: "Which paper would you like to test?",
+    choices: [
+      { title: "All papers", value: "all" },
+      ...data.papers.map(({ id }) => ({
+        title: id,
+        value: id,
+      })),
+    ],
+  });
 
   const { promptChoice } = await prompt({
     type: "select",
@@ -66,7 +88,12 @@ const main = async () => {
     ],
   });
 
-  for (const paper of data.papers) {
+  const papers =
+    paperChoice === "all"
+      ? data.papers
+      : data.papers.filter(({ id }) => id === paperChoice);
+
+  for (const paper of papers) {
     for (const paragraph of paper.paragraphs) {
       if (promptChoice === "all") {
         for (const { file, prompt } of prompts) {
