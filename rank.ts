@@ -2,7 +2,6 @@ import fs from "fs";
 import prompts from "prompts";
 
 const DATA_FILE = "data.json";
-
 interface Translation {
   id: string;
   content: string;
@@ -45,21 +44,26 @@ const compareTranslations = async (paragraph: Paragraph) => {
   const comparisons: [Translation, Translation][] = [];
   for (let i = 0; i < translations.length; i++) {
     for (let j = i + 1; j < translations.length; j++) {
-      comparisons.push([translations[i], translations[j]]);
+      if (translations[i].id !== translations[j].id) {
+        comparisons.push([translations[i], translations[j]]);
+      }
     }
   }
 
+  let remainingComparisons = comparisons.length;
   for (const [a, b] of comparisons) {
     const { value } = await prompts({
       type: "select",
       name: "value",
-      message: `Which translation is better?\n\n${a.content}\n\n---\n\n${b.content}`,
+      message: `\n\n--------------------\nWhich translation is better?\n\n${a.content}\n\n---\n\n${b.content}\n\nRemaining comparisons for this paragraph: ${remainingComparisons}`,
       choices: [
         { title: "First one", value: "first" },
         { title: "Second one", value: "second" },
         { title: "They are equal", value: "equal" },
       ],
     });
+
+    remainingComparisons--;
 
     if (value === "first") {
       rankings[a.id]++;
@@ -75,19 +79,54 @@ const compareTranslations = async (paragraph: Paragraph) => {
 const main = async () => {
   const data = loadData();
 
-  for (const paper of data.papers) {
+  const { paperChoice } = await prompts({
+    type: "select",
+    name: "paperChoice",
+    message: "Which papers would you like to rank?",
+    choices: [
+      { title: "All papers", value: "all" },
+      ...data.papers.map(({ id }, index) => ({
+        title: `Paper ${index + 1}: ${id}`,
+        value: id,
+      })),
+    ],
+  });
+
+  let totalComparisons = 0;
+  const papersToRank =
+    paperChoice === "all"
+      ? data.papers
+      : [data.papers.find((paper) => paper.id === paperChoice)!];
+
+  for (const paper of papersToRank) {
+    console.log(`Ranking paper: ${paper.id}`);
     for (const paragraph of paper.paragraphs) {
+      totalComparisons +=
+        (paragraph.translations.length * (paragraph.translations.length + 1)) /
+        2;
+    }
+  }
+
+  let remainingComparisons = totalComparisons;
+
+  for (const paper of papersToRank) {
+    console.log(`Ranking paper: ${paper.id}`);
+    for (const paragraph of paper.paragraphs) {
+      console.log(`Paragraph: ${paragraph.source.slice(0, 50)}...`);
       const rankings = await compareTranslations(paragraph);
       paragraph.translations = rankings.map(({ id, rank }) => {
         const translation = paragraph.translations.find((t) => t.id === id);
         if (translation) {
+          remainingComparisons -= paragraph.translations.length;
           return { ...translation, rank };
         } else if (id === "source") {
+          remainingComparisons -= paragraph.translations.length;
           return { id: "source", content: paragraph.source, rank };
         } else {
           throw new Error(`Translation with id ${id} not found`);
         }
       });
+      console.log(`Remaining comparisons: ${remainingComparisons}`);
     }
   }
 
