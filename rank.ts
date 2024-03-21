@@ -30,10 +30,14 @@ const saveData = (data: Data) => {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 };
 
+const badIds = ["10", "11", "14", "15", "16", "17"];
+
 const compareTranslations = async (paragraph: Paragraph) => {
   const translations = [
     { id: "source", content: paragraph.source },
-    ...paragraph.translations,
+    ...paragraph.translations.filter(
+      (t) => badIds.some((badId) => t.id.startsWith(badId)) === false
+    ),
   ];
   const rankings: Record<string, number> = {};
 
