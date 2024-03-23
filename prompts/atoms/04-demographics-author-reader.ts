@@ -1,4 +1,10 @@
-const authorDemo = `sex: male; age: 26; race: white; social-status: upper-class; education: bachelor's degree; occupation: software engineer`;
+const readerSex = null;
+const readerAge = null;
+const readerSocialStatus = null;
+const readerEducation = null;
+const readerOccupation = null;
+
+const readerDemo = `sex: ${readerSex}; age: ${readerAge}; social-status: ${readerSocialStatus}; education: ${readerEducation}; occupation: ${readerOccupation}`;
 
 /**
  * This is more experimental, but it's well documented that demographics can influence the way people write and speak (for example, in job descriptions: https://www.paycor.com/resource-center/articles/are-your-job-descriptions-driving-away-talent-with-unconscious-gender-bias/)
@@ -11,7 +17,7 @@ const authorDemo = `sex: male; age: 26; race: white; social-status: upper-class;
 export const prompt = `
 Infer the demographics of the author, including age, sex, race, education level, socioeconomic status, and any other relevant demographic information.
 
-Here is the demographic information of the author: ${authorDemo}
+Here is the demographic information of the reader: ${readerDemo}
 
 Given this information, rewrite the passage to be easier for the reader to comprehend.
 `;

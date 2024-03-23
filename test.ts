@@ -3,7 +3,7 @@ import path from "path";
 import prompt from "prompts";
 import { askAI } from "./lib/api";
 
-const PROMPTS_DIR = "prompts";
+const PROMPTS_DIR = "prompts/atoms";
 const DATA_FILE = "data.json";
 const MODEL = "gpt-4";
 

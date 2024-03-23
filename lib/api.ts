@@ -2,14 +2,6 @@ import OpenAI from "openai";
 
 const openai = new OpenAI();
 
-interface ChatResponse {
-  choices: {
-    message: {
-      content: string;
-    };
-  }[];
-}
-
 export async function askAI(
   model: "gpt-3.5-turbo" | "gpt-4",
   content: string

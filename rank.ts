@@ -30,28 +30,10 @@ const saveData = (data: Data) => {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 };
 
-const badIds = [
-  "01",
-  "02",
-  "05",
-  "06",
-  "07",
-  "08",
-  "10",
-  "11",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-];
-
 const compareTranslations = async (paragraph: Paragraph) => {
   const translations = [
     { id: "source", content: paragraph.source },
-    ...paragraph.translations.filter(
-      (t) => badIds.some((badId) => t.id.startsWith(badId)) === false
-    ),
+    ...paragraph.translations,
   ];
   const rankings: Record<string, number> = {};
 
@@ -91,14 +73,6 @@ const compareTranslations = async (paragraph: Paragraph) => {
   }
 
   const sortedRankings = Object.entries(rankings).sort((a, b) => b[1] - a[1]);
-
-  // Add back all translations that were filtered out
-  for (const translation of translations) {
-    if (!sortedRankings.some(([id]) => id === translation.id)) {
-      sortedRankings.push([translation.id, 100]);
-    }
-  }
-
   return sortedRankings.map(([id], index) => ({ id, rank: index + 1 }));
 };
 
