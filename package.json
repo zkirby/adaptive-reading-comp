@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "dotenv -e .env ts-node test.ts",
-    "rank": "ts-node rank.ts",
-    "translations": "ts-node translations.ts"
+    "test": "dotenv -e .env ts-node src/test.ts",
+    "rank": "ts-node src/rank.ts",
+    "translations": "ts-node src/translations.ts",
+    "rankings": "ts-node src/rankings.ts"
   },
   "keywords": [],
   "author": "",
